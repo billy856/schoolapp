@@ -13,25 +13,9 @@ public class Cule {
     private String culeclass;
     private String culestatus;
     private String culedetail;
-
     private String culeuserid;
-    private String culetitile;
-
-    public String getCuletitile() {
-        return culetitile;
-    }
-
-    public void setCuletitile(String culetitile) {
-        this.culetitile = culetitile;
-    }
-
-    public String getCuleuserid() {
-        return culeuserid;
-    }
-
-    public void setCuleuserid(String culeuserid) {
-        this.culeuserid = culeuserid;
-    }
+    private String culetittle;
+    private String culeimages;
 
     public String getCuleid() {
         return culeid;
@@ -71,5 +55,29 @@ public class Cule {
 
     public void setCuledetail(String culedetail) {
         this.culedetail = culedetail;
+    }
+
+    public String getCuleuserid() {
+        return culeuserid;
+    }
+
+    public void setCuleuserid(String culeuserid) {
+        this.culeuserid = culeuserid;
+    }
+
+    public String getCuletittle() {
+        return culetittle;
+    }
+
+    public void setCuletittle(String culetittle) {
+        this.culetittle = culetittle;
+    }
+
+    public String getCuleimages() {
+        return culeimages;
+    }
+
+    public void setCuleimages(String culeimages) {
+        this.culeimages = culeimages;
     }
 }

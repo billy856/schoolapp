@@ -132,7 +132,7 @@ public class MainController {
     }
 
     @RequestMapping(value = "/addCule",method = RequestMethod.POST)
-    public String addCule(@RequestParam(value = "culetitile", required = true) String culetitile,
+    public String addCule(@RequestParam(value = "culetittle", required = true) String culetittle,
                           @RequestParam(value = "culedetail", required = true) String culedetail,
                           @RequestParam(value = "culeclass", required = true) String culeclass,
                           @RequestParam(value = "culeuserid", required = true) String culeuserid
@@ -143,10 +143,11 @@ public class MainController {
             cule.setCuledate(DateUtil.getCluseDate());
             cule.setCuleid(DateUtil.getClueDateID());
             cule.setCuledetail(culedetail);
-            cule.setCuletitile(culetitile);
+            cule.setCuletittle(culetittle);
             cule.setCulestatus("待处理");
             cule.setCuleuserid(culeuserid);
             cule.setCuleid(DateUtil.getClueDateID());
+            cule.setCuleclass(1+"");
             culeRepository.save(null);
             return  StatusReport.buildStringResult(200,"Add success",null);
         }catch (Exception e){
