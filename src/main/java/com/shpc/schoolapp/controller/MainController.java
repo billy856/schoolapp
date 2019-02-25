@@ -1,13 +1,7 @@
 package com.shpc.schoolapp.controller;
 
-import com.shpc.schoolapp.model.Cule;
-import com.shpc.schoolapp.model.Xinwen;
-import com.shpc.schoolapp.model.Xinwenlist;
-import com.shpc.schoolapp.model.User;
-import com.shpc.schoolapp.repository.CuleRepository;
-import com.shpc.schoolapp.repository.XinwenRepository;
-import com.shpc.schoolapp.repository.XinwenlistRepository;
-import com.shpc.schoolapp.repository.UserRepository;
+import com.shpc.schoolapp.model.*;
+import com.shpc.schoolapp.repository.*;
 import com.shpc.schoolapp.util.DateUtil;
 import com.shpc.schoolapp.util.Md5Util;
 import com.shpc.schoolapp.util.StatusReport;
@@ -33,6 +27,8 @@ public class MainController {
     XinwenlistRepository xinwenlistRepository;
     @Autowired
     CuleRepository culeRepository;
+    @Autowired
+    CommentRepository commentRepository;
 
     Map<String,Object> map=new HashMap<String,Object>();
 
@@ -133,24 +129,75 @@ public class MainController {
         }
     }
 
+    @RequestMapping(value = "/getCommentlist/{newid}",method = RequestMethod.GET)
+    public String getCommentlist(@PathVariable String newid) throws Exception{
+        try{
+            List<Comment> comments = commentRepository.findByNewid(newid);
+            map.put("Comments",comments);
+            return StatusReport.buildResult(200,map,null);
+        }catch (Exception e){
+            return  StatusReport.buildStringResult(400,null,e.getMessage());
+        }finally {
+            map.clear();
+        }
+    }
+
+    @RequestMapping(value = "/saveComment",method = RequestMethod.POST)
+    public String saveComment(@RequestParam(value = "commentdetail",required = true) String commentdetail,
+                              @RequestParam(value = "newid",required = true) String newid,
+                              @RequestParam(value = "userid",required = true) String userid,
+                              @RequestParam(value = "username",required = true) String username
+    ) throws Exception{
+        try{
+            Comment comment = new Comment();
+            comment.setCommentid(DateUtil.getClueDateID());
+            comment.setNewid(newid);
+            comment.setCommentdate(DateUtil.getCluseDate());
+            comment.setCommentdetail(commentdetail);
+            comment.setUserid(userid);
+            comment.setUsername(username);
+            commentRepository.save(comment);
+            return  StatusReport.buildStringResult(200,"Add success",null);
+        }catch (Exception e){
+            return  StatusReport.buildStringResult(400,null,e.getMessage());
+        }finally {
+            map.clear();
+        }
+    }
+    @RequestMapping(value = "/getCuledetail/{culeid}",method = RequestMethod.GET)
+    public String getCuleDetail(@PathVariable String culeid) throws Exception{
+        try{
+            Cule cule = culeRepository.findByCuleid(culeid);
+            map.put("Cule",cule);
+            return StatusReport.buildResult(200,map,null);
+        }catch (Exception e){
+            return  StatusReport.buildStringResult(400,null,e.getMessage());
+        }finally {
+            map.clear();
+        }
+    }
     @RequestMapping(value = "/addCule",method = RequestMethod.POST )
     public String addCule(@RequestParam(value = "culetittle", required = true) String culetittle,
                           @RequestParam(value = "culedetail", required = true) String culedetail,
                           @RequestParam(value = "culeclass", required = true) String culeclass,
                           @RequestParam(value = "culeuserid", required = true) String culeuserid,
-                          @RequestParam(value = "file") MultipartFile file
-                          ) throws Exception{
+                          @RequestParam(value = "file",required = false) MultipartFile file
+    ) throws Exception{
         try{
 
             String culeid = DateUtil.getClueDateID();
             Cule cule = new Cule();
-            if (file.isEmpty()!=true){
-                String filename = "/var/www/html/"+culeid+".jpg";
-                File savefile = new File(filename);
-                file.transferTo(savefile);
-                cule.setCuleimages("1");
-            }else{
+            if (null == file){
                 cule.setCuleimages("0");
+            }else {
+                if (file.isEmpty()!=true){
+                    String filename = "/var/www/html/"+culeid+".jpg";
+                    File savefile = new File(filename);
+                    file.transferTo(savefile);
+                    cule.setCuleimages("1");
+                }else{
+                    cule.setCuleimages("0");
+                }
             }
             cule.setCuleclass(culeclass);
             cule.setCuledate(DateUtil.getCluseDate());
@@ -159,7 +206,6 @@ public class MainController {
             cule.setCuletittle(culetittle);
             cule.setCulestatus("待处理");
             cule.setCuleuserid(culeuserid);
-            cule.setCuleid(DateUtil.getClueDateID());
             culeRepository.save(cule);
             return  StatusReport.buildStringResult(200,"Add success",null);
         }catch (Exception e){
