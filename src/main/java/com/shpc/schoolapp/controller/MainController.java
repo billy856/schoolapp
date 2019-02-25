@@ -13,7 +13,9 @@ import com.shpc.schoolapp.util.Md5Util;
 import com.shpc.schoolapp.util.StatusReport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,24 +133,34 @@ public class MainController {
         }
     }
 
-    @RequestMapping(value = "/addCule",method = RequestMethod.POST)
+    @RequestMapping(value = "/addCule",method = RequestMethod.POST )
     public String addCule(@RequestParam(value = "culetittle", required = true) String culetittle,
                           @RequestParam(value = "culedetail", required = true) String culedetail,
                           @RequestParam(value = "culeclass", required = true) String culeclass,
-                          @RequestParam(value = "culeuserid", required = true) String culeuserid
+                          @RequestParam(value = "culeuserid", required = true) String culeuserid,
+                          @RequestParam(value = "file") MultipartFile file
                           ) throws Exception{
         try{
+
+            String culeid = DateUtil.getClueDateID();
             Cule cule = new Cule();
+            if (file.isEmpty()!=true){
+                String filename = "/var/www/html/"+culeid+".jpg";
+                File savefile = new File(filename);
+                file.transferTo(savefile);
+                cule.setCuleimages("1");
+            }else{
+                cule.setCuleimages("0");
+            }
             cule.setCuleclass(culeclass);
             cule.setCuledate(DateUtil.getCluseDate());
-            cule.setCuleid(DateUtil.getClueDateID());
+            cule.setCuleid(culeid);
             cule.setCuledetail(culedetail);
             cule.setCuletittle(culetittle);
             cule.setCulestatus("待处理");
             cule.setCuleuserid(culeuserid);
             cule.setCuleid(DateUtil.getClueDateID());
-            cule.setCuleclass(1+"");
-            culeRepository.save(null);
+            culeRepository.save(cule);
             return  StatusReport.buildStringResult(200,"Add success",null);
         }catch (Exception e){
             return  StatusReport.buildStringResult(400,null,e.getMessage());
